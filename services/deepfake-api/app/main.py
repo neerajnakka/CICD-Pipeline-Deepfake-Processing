@@ -22,6 +22,7 @@ async def root():
     Redirect to documentation.
     """
     from fastapi.responses import RedirectResponse
+
     return RedirectResponse(url="/docs")
 
 
