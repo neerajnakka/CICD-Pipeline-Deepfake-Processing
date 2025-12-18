@@ -60,19 +60,20 @@ jobs:
           docker build -t deepfake-api:${{ github.sha }} .
           echo "✅ Docker Image built successfully: deepfake-api:${{ github.sha }}"
 
-  deploy-staging:
-    name: 🚀 Deploy to Staging (Mock)
+  deploy-production:
+    name: 🚀 Deploy to Railway (Production)
     needs: build-artifact
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
     steps:
-      - name: Mock Deployment to Railway
-        run: |
-          echo "Starting deployment to Railway Staging Environment..."
-          echo "Connecting to Railway Project: deepfake-detection-v1"
-          echo "Pushing container image..."
-          sleep 2  # Simulate meaningful work
-          echo "Verify health check..."
-          echo "Health check passed: /health -> 200 OK"
-          echo "✅ Deployment Complete! Service is live."
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service deepfake-api --detach

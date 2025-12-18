@@ -79,15 +79,17 @@ uvicorn app.main:app --reload
 
 Access the API documentation at: `http://localhost:8000/docs`
 
-### 3. Run with Docker
+### 3. Deployment Configuration (Railway)
 
-```bash
-# Build the image
-docker build -t deepfake-api ./services/deepfake-api
-
-# Run the container
-docker run -p 8000:8000 deepfake-api
-```
+1.  **Create Railway Project**: Go to [Railway.app](https://railway.app/) and create a new empty project.
+2.  **Get Token**: 
+    - Go to Settings -> Tokens.
+    - Generate a **New Token**.
+3.  **Add to GitHub**:
+    - Go to your GitHub Repo -> Settings -> Secrets and variables -> Actions.
+    - Click **New repository secret**.
+    - Name: `RAILWAY_TOKEN`.
+    - Value: (Paste your Railway Token).
 
 ## 🤖 CI/CD Pipeline
 
@@ -95,7 +97,7 @@ The pipeline is defined in `.github/workflows/main.yml` and consists of three st
 
 1.  **Quality Gate**: Runs `black` (checking), `flake8` (linting), and `pytest` (unit tests). Fails immediately if standards are not met.
 2.  **Build Artifact**: Builds the Docker container and tags it with the commit SHA for traceability.
-3.  **Deploy (Staging)**: Simulates a deployment to a PaaS provider (e.g., Railway).
+3.  **Deploy (Production)**: Automatically deploys the container to Railway using the `@railway/cli`.
 
 ## 🔮 Future Roadmap
 
