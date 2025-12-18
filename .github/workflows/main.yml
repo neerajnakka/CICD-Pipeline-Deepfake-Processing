@@ -68,10 +68,18 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/deepfake-api:latest,${{ secrets.DOCKER_USERNAME }}/deepfake-api:${{ github.sha }}
 
-  # deploy-aws:
-  #   name: 🚀 Deploy to AWS App Runner
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Info
-  #       run: echo "Image pushed to Docker Hub. Ready for App Runner deployment."
+  deploy-render:
+    name: 🚀 Deploy to Render
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Trigger Render Deployment
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK secret is missing!"
+            exit 1
+          fi
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+          echo "✅ Render Deployment Triggered Successfully!"

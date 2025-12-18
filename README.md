@@ -97,17 +97,38 @@ Access the API documentation at: `http://localhost:8000/docs`
 
 ## 🤖 CI/CD Pipeline
 
-The pipeline is defined in `.github/workflows/main.yml` and consists of two main stages:
+### 4. Deployment Configuration (Render)
 
-1.  **Quality Gate**: Runs `black`, `flake8`, and `pytest`.
-2.  **Build & Push**: Builds the Docker container and pushes it to **Docker Hub** with two tags: `latest` and `commit-sha`.
+1.  **Create Service**:
+    - Go to [Render Dashboard](https://dashboard.render.com/).
+    - Click **New +** -> **Web Service**.
+    - Select **"Deploy from Docker Registry"**.
+    - Image URL: `<your-docker-username>/deepfake-api:latest`.
+    - Name: `deepfake-api`.
+    - Plan: **Free**.
+    - Click **Create Web Service**.
 
-## 🔮 Future Roadmap
+2.  **Get Deploy Hook**:
+    - Click on your new service.
+    - Go to **Settings** -> **Build & Deploy**.
+    - Find **"Deploy Hook"**.
+    - Click **Copy**. (It looks like `https://api.render.com/deploy/srv-...`).
 
-- [ ] **AWS App Runner**: Connect App Runner to the Docker Hub repository for auto-deployment.
-- [ ] **Real AI Model**: Replace the mock service with a TensorFlow/PyTorch model.
-- [ ] **DB Integration**: PostgreSQL for storing analysis history.
+3.  **Add to GitHub**:
+    - Go to your GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**.
+    - Add **New repository secret**:
+        - `RENDER_DEPLOY_HOOK`: Paste the URL you copied.
+
+## 🤖 CI/CD Pipeline
+
+The pipeline is defined in `.github/workflows/main.yml`:
+
+1.  **Quality Gate**: Linting and Testing.
+2.  **Build & Push**: Pushes Docker image to Docker Hub.
+3.  **Deploy**: Triggers Render to pull the new image and update the live site.
+
+
 
 ---
 **Author**: Neeraj Chandra Nakka
-**License**: MIT
+
