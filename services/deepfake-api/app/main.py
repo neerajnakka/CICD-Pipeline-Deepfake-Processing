@@ -16,6 +16,15 @@ async def health_check():
     return {"status": "healthy", "version": settings.VERSION}
 
 
+@app.get("/", include_in_schema=False)
+async def root():
+    """
+    Redirect to documentation.
+    """
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/docs")
+
+
 if __name__ == "__main__":
     import uvicorn
 
