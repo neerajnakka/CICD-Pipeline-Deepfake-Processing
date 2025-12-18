@@ -99,6 +99,11 @@ The automated pipeline performs the following steps on every push to `main`:
 
 ---
 
+## The CICD pipeline is success!
+
+![CICD pipeline](./cicd.png)
+
+
 ## 📦 Project Structure
 
 ```bash
