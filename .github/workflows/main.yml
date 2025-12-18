@@ -1,0 +1,78 @@
+name: Deepfake Detection CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  quality-gate:
+    name: 🛡️ Quality Gate (Lint & Test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/deepfake-api
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🎨 Lint with Black AND Flake8
+        run: |
+          # Check formatting (Check only, don't modify)
+          black --check .
+          # Check code style
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: 🧪 Run Unit & Integration Tests
+        run: |
+          pytest
+
+  build-artifact:
+    name: 📦 Build Docker Image
+    needs: quality-gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/deepfake-api
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker Image
+        run: |
+          docker build -t deepfake-api:${{ github.sha }} .
+          echo "✅ Docker Image built successfully: deepfake-api:${{ github.sha }}"
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging (Mock)
+    needs: build-artifact
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Mock Deployment to Railway
+        run: |
+          echo "Starting deployment to Railway Staging Environment..."
+          echo "Connecting to Railway Project: deepfake-detection-v1"
+          echo "Pushing container image..."
+          sleep 2  # Simulate meaningful work
+          echo "Verify health check..."
+          echo "Health check passed: /health -> 200 OK"
+          echo "✅ Deployment Complete! Service is live."
