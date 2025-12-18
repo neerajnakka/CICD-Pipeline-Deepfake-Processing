@@ -38,6 +38,12 @@ This project strictly follows the industry-standard requirements for a complete 
 *   **Platform:** **GitHub Actions** (`.github/workflows/main.yml`)
 *   **Reasoning:** Chosen for its tight integration with the repository and free runner minutes for public projects.
 
+### ✅ B. Example CI/CD Repositories (Ready Reference)
+* **Custom Sample Implementation** to demonstrate:
+*   FastAPI + GitHub Actions (similar to reference examples).
+*   Python CI (Linting + Testing).
+*   Containerized Microservice Deployment.
+
 ### ✅ C. Pipeline Components
 We implemented a strict "Quality Gate" that prevents bad code from reaching production:
 
@@ -65,7 +71,8 @@ We implemented a strict "Quality Gate" that prevents bad code from reaching prod
 git clone https://github.com/neerajnakka/CICD-Pipeline-Deepfake-Processing.git
 
 # Run with Docker
-docker-compose up --build
+docker build -t deepfake-api ./services/deepfake-api
+docker run -p 8000:8000 deepfake-api
 ```
 
 ### 2. View API Documentation
