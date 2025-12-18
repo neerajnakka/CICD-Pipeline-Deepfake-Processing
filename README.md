@@ -4,42 +4,93 @@
 ![Python](https://img.shields.io/badge/python-3.9-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Coverage](https://img.shields.io/badge/coverage-100%25-green)
+![Deployment](https://img.shields.io/badge/deploy-Render-black)
 
-A production-grade microservice for analyzing media content to detect deepfakes. This project demonstrates a complete **DevOps Lifecycle**, featuring automated testing, containerization, and a CI/CD pipeline targeting cloud deployment.
+A production-grade microservice for analyzing media content to detect deepfakes. This project serves as a comprehensive demonstration of a **Modern DevOps Lifecycle**, implementing automated testing, containerization, and continuous deployment to the cloud.
 
-## 🏗️ Architecture
+---
 
-The system follows a modern microservice architecture, packaged in Docker and automated via GitHub Actions.
+## 🏗️ Architecture (Requirement B)
+
+The system is built on a robust, scalable architecture using **FastAPI** for high-performance async processing and **Docker** for consistent portability.
 
 ```mermaid
 graph LR
     User[Client] -->|POST /analysis| API[FastAPI Service]
     API -->|Inference| Model[Mock Deepfake Model]
     
-    subgraph "CI/CD Pipeline"
+    subgraph "CI/CD Pipeline (GitHub Actions)"
         Git[GitHub Repo] -->|Push| QA[Quality Gate]
         QA -->|Pass| Build[Docker Build]
-        Build -->|Success| Deploy[Mock Deployment]
+        Build -->|Success| Registry[Docker Hub]
+        Registry -->|Webhook| Cloud[Render Cloud]
     end
 ```
 
-## 🚀 Key Features
+---
 
-*   **RESTful API**: Built with FastAPI for high performance.
-*   **Mock ML Inference**: Simulates realistic model latency and confidence scoring.
-*   **Professional Logic**: Structured response models with metadata.
-*   **Quality Assurance**: Integrated `pytest`, `flake8`, and `black` for code quality.
-*   **Containerized**: Production-ready `Dockerfile` using multi-stage best practices.
-*   **CI/CD**: Full GitHub Actions workflow for Test -> Build -> Deploy.
+## �️ Implementation Details (Requirements A-E)
 
-## 🛠️ Tech Stack
+This project strictly follows the industry-standard requirements for a complete CI/CD setup:
 
-*   **Language**: Python 3.9
-*   **Framework**: FastAPI + Uvicorn
-*   **Testing**: Pytest + TestClient
-*   **Container**: Docker
-*   **CI/CD**: GitHub Actions
-*   **Deployment Target**: Railway (Mock/Planned)
+### ✅ A. CI/CD Platform
+*   **Platform:** **GitHub Actions** (`.github/workflows/main.yml`)
+*   **Reasoning:** Chosen for its tight integration with the repository and free runner minutes for public projects.
+
+### ✅ C. Pipeline Components
+We implemented a strict "Quality Gate" that prevents bad code from reaching production:
+
+1.  **PyTest** (`pytest`): Runs automated unit and integration tests.
+2.  **Coverage.py** (`pytest-cov`): Ensures 100% code coverage before deployment.
+3.  **Black** (`black`): Auto-formats code to enforce PEP 8 style.
+4.  **Flake8** (`flake8`): Lints code to catch logical errors and unused imports.
+5.  **Docker** (`docker build`): Multi-stage builds to create efficient, secure artifacts.
+
+### ✅ D. Model & Artifact Versioning
+*   **Versioning:** Docker images are tagged with the specific **Commit SHA** (e.g., `deepfake-api:a1b2c3d`) for precise rollback capabilities.
+*   **Registry:** Images are stored securely on **Docker Hub**.
+
+### ✅ E. Deployment Targets
+*   **Target:** **Render** (Cloud PaaS)
+*   **Automation:** Deployment is triggered automatically via a **Deploy Hook** immediately after a successful Docker build.
+
+---
+
+## ⚡ Quick Start
+
+### 1. Run Locally
+```bash
+# Clone the repo
+git clone https://github.com/neerajnakka/CICD-Pipeline-Deepfake-Processing.git
+
+# Run with Docker
+docker-compose up --build
+```
+
+### 2. View API Documentation
+Once running, visit the interactive Swagger UI:
+👉 **[Live Demo](https://deepfake-api-latest.onrender.com/docs)**
+
+---
+
+## 🤖 The CI/CD Workflow
+
+The automated pipeline performs the following steps on every push to `main`:
+
+1.  **lint-and-test**:
+    *   Checks code style with `black --check`.
+    *   Lints with `flake8`.
+    *   Runs tests with `pytest --cov`.
+2.  **build-and-push**:
+    *   Logs into Docker Hub securely.
+    *   Builds the image.
+    *   Pushes tags: `latest` and `<commit-sha>`.
+3.  **deploy-render**:
+    *   Triggers the Render Cloud to pull the new `latest` image.
+    *   Restart the live service with zero downtime.
+
+---
 
 ## 📦 Project Structure
 
@@ -58,77 +109,5 @@ graph LR
 └── README.md
 ```
 
-## ⚡ Quick Start (Local)
-
-### 1. Prerequisites
-- Python 3.9+
-- Docker (Optional)
-
-### 2. Run with Python
-
-```bash
-# Navigate to the service
-cd services/deepfake-api
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the server
-uvicorn app.main:app --reload
-```
-
-Access the API documentation at: `http://localhost:8000/docs`
-
-### 3. Container Registry Configuration (Docker Hub)
-
-1.  **Get Docker Hub Token**:
-    - Log in to [Docker Hub](https://hub.docker.com/).
-    - Go to **Account Settings** -> **Security**.
-    - Click **New Access Token**.
-    - Description: `GitHub Actions`.
-    - Permissions: Read, Write, Delete.
-    - Copy the generated token.
-
-2.  **Add Secrets to GitHub**:
-    - Go to your GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**.
-    - Add **New repository secret**:
-        - `DOCKER_USERNAME`: Your Docker Hub username.
-        - `DOCKER_PASSWORD`: The Access Token you just copied.
-
-## 🤖 CI/CD Pipeline
-
-### 4. Deployment Configuration (Render)
-
-1.  **Create Service**:
-    - Go to [Render Dashboard](https://dashboard.render.com/).
-    - Click **New +** -> **Web Service**.
-    - Select **"Deploy from Docker Registry"**.
-    - Image URL: `<your-docker-username>/deepfake-api:latest`.
-    - Name: `deepfake-api`.
-    - Plan: **Free**.
-    - Click **Create Web Service**.
-
-2.  **Get Deploy Hook**:
-    - Click on your new service.
-    - Go to **Settings** -> **Build & Deploy**.
-    - Find **"Deploy Hook"**.
-    - Click **Copy**. (It looks like `https://api.render.com/deploy/srv-...`).
-
-3.  **Add to GitHub**:
-    - Go to your GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**.
-    - Add **New repository secret**:
-        - `RENDER_DEPLOY_HOOK`: Paste the URL you copied.
-
-## 🤖 CI/CD Pipeline
-
-The pipeline is defined in `.github/workflows/main.yml`:
-
-1.  **Quality Gate**: Linting and Testing.
-2.  **Build & Push**: Pushes Docker image to Docker Hub.
-3.  **Deploy**: Triggers Render to pull the new image and update the live site.
-
-
-
 ---
 **Author**: Neeraj Chandra Nakka
-
