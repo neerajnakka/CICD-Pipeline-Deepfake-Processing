@@ -38,7 +38,7 @@ jobs:
 
       - name: 🧪 Run Unit & Integration Tests
         run: |
-          pytest
+          python -m pytest
 
   build-artifact:
     name: 📦 Build Docker Image
