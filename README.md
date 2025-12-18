@@ -79,30 +79,33 @@ uvicorn app.main:app --reload
 
 Access the API documentation at: `http://localhost:8000/docs`
 
-### 3. Deployment Configuration (Railway)
+### 3. Container Registry Configuration (Docker Hub)
 
-1.  **Create Railway Project**: Go to [Railway.app](https://railway.app/) and create a new empty project.
-2.  **Get Token**: 
-    - Go to Settings -> Tokens.
-    - Generate a **New Token**.
-3.  **Add to GitHub**:
-    - Go to your GitHub Repo -> Settings -> Secrets and variables -> Actions.
-    - Click **New repository secret**.
-    - Name: `RAILWAY_TOKEN`.
-    - Value: (Paste your Railway Token).
+1.  **Get Docker Hub Token**:
+    - Log in to [Docker Hub](https://hub.docker.com/).
+    - Go to **Account Settings** -> **Security**.
+    - Click **New Access Token**.
+    - Description: `GitHub Actions`.
+    - Permissions: Read, Write, Delete.
+    - Copy the generated token.
+
+2.  **Add Secrets to GitHub**:
+    - Go to your GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**.
+    - Add **New repository secret**:
+        - `DOCKER_USERNAME`: Your Docker Hub username.
+        - `DOCKER_PASSWORD`: The Access Token you just copied.
 
 ## 🤖 CI/CD Pipeline
 
-The pipeline is defined in `.github/workflows/main.yml` and consists of three stages:
+The pipeline is defined in `.github/workflows/main.yml` and consists of two main stages:
 
-1.  **Quality Gate**: Runs `black` (checking), `flake8` (linting), and `pytest` (unit tests). Fails immediately if standards are not met.
-2.  **Build Artifact**: Builds the Docker container and tags it with the commit SHA for traceability.
-3.  **Deploy (Production)**: Automatically deploys the container to Railway using the `@railway/cli`.
+1.  **Quality Gate**: Runs `black`, `flake8`, and `pytest`.
+2.  **Build & Push**: Builds the Docker container and pushes it to **Docker Hub** with two tags: `latest` and `commit-sha`.
 
 ## 🔮 Future Roadmap
 
+- [ ] **AWS App Runner**: Connect App Runner to the Docker Hub repository for auto-deployment.
 - [ ] **Real AI Model**: Replace the mock service with a TensorFlow/PyTorch model.
-- [ ] **Railway Deployment**: Connect GitHub repo to Railway for live URL.
 - [ ] **DB Integration**: PostgreSQL for storing analysis history.
 
 ---
